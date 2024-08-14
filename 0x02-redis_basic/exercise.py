@@ -36,7 +36,8 @@ def replay(method: Callable) -> None:
         """Display the history of calls of a particular function."""
         cache = method.__self__
         name = method.__qualname__
-        print('{} was called {} times:'.format(name, cache.get_int(name)))
+        val = int(cache.get(name) or b"0")
+        print('{} was called {} times:'.format(name, val))
 
         inp_key = name + ':inputs'
         out_key = name + ':outputs'
