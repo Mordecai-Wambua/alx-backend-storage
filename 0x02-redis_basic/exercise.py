@@ -18,6 +18,7 @@ def count_calls(method: Callable) -> Callable:
 
 
 def call_history(method: Callable) -> Callable:
+    """System to get method parrameters and outputs."""
     @wraps(method)
     def wrapper(self, *args, **kwds):
         key = method.__qualname__
@@ -60,3 +61,14 @@ class Cache:
     def get_int(self, key: str) -> int:
         """Retrieve integer values."""
         return self.get(key, int)
+
+    def replay(self, method: Callable) -> None:
+        """Display the history of calls of a particular function."""
+        name = method.__qualname__
+        print('{} was called {} times:'.format(name, self.get_int(name)))
+        inp_key = name + ':inputs'
+        out_key = name + ':outputs'
+        inp = [i.decode('utf-8') for i in self._redis.lrange(inp_key, 0, -1)]
+        out = [o.decode('utf-8') for o in self._redis.lrange(out_key, 0, -1)]
+        for i, o in zip(inp, out):
+            print('{}(*{}) -> {}'.format(name, i, o))
