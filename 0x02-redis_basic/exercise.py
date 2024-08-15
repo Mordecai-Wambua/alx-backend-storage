@@ -33,19 +33,18 @@ def call_history(method: Callable) -> Callable:
 
 
 def replay(method: Callable) -> None:
-        """Display the history of calls of a particular function."""
-        cache = method.__self__
-        name = method.__qualname__
-        val = int(cache.get(name) or b"0")
-        print('{} was called {} times:'.format(name, val))
+    """Display the history of calls of a particular function."""
+    cache = method.__self__
+    name = method.__qualname__
+    val = int(cache.get(name) or b"0")
+    print('{} was called {} times:'.format(name, val))
+    inp_key = name + ':inputs'
+    out_key = name + ':outputs'
 
-        inp_key = name + ':inputs'
-        out_key = name + ':outputs'
-
-        inp = [i.decode('utf-8') for i in cache._redis.lrange(inp_key, 0, -1)]
-        out = [o.decode('utf-8') for o in cache._redis.lrange(out_key, 0, -1)]
-        for i, o in zip(inp, out):
-            print('{}(*{}) -> {}'.format(name, i, o))
+    inp = [i.decode('utf-8') for i in cache._redis.lrange(inp_key, 0, -1)]
+    out = [o.decode('utf-8') for o in cache._redis.lrange(out_key, 0, -1)]
+    for i, o in zip(inp, out):
+        print('{}(*{}) -> {}'.format(name, i, o))
 
 
 class Cache:
